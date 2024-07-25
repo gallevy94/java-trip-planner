@@ -13,7 +13,7 @@ public class ChatMessage {
     }
 
     public String getRole() {
-        return this.role;
+        return role;
     }
 
     public void setRole(String role) {
@@ -21,7 +21,7 @@ public class ChatMessage {
     }
 
     public String getContent() {
-        return this.content;
+        return content;
     }
 
     public void setContent(String content) {

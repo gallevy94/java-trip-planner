@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package com.handson.trip_planner.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -23,40 +18,29 @@ import org.hibernate.validator.constraints.Length;
 import org.joda.time.LocalDateTime;
 
 @Entity
-@Table(
-        name = "customer"
-)
+@Table(name = "customers")
 public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.AUTO
-    )
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(
-            nullable = false,
-            updatable = false
-    )
-    private @NotNull Date createdAt = Dates.nowUTC();
-    private @NotEmpty @Length(
-            max = 60
-    ) String fullname;
-    private String email;
+    @NotNull
+    @Column(nullable = false, updatable = false)
+    private Date createdAt = Dates.nowUTC();
 
-    public Customer() {
-    }
-
-    @JsonFormat(
-            shape = Shape.STRING,
-            pattern = "yyyy-MM-dd HH:mm:ss"
-    )
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("createdAt")
     public LocalDateTime calcCreatedAt() {
-        return Dates.atLocalTime(this.createdAt);
+        return Dates.atLocalTime(createdAt);
     }
 
+    @NotEmpty
+    @Length(max = 60)
+    private String fullname;
+    private String email;
+
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -64,7 +48,7 @@ public class Customer implements Serializable {
     }
 
     public Date getCreatedAt() {
-        return this.createdAt;
+        return createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
@@ -72,7 +56,7 @@ public class Customer implements Serializable {
     }
 
     public String getFullname() {
-        return this.fullname;
+        return fullname;
     }
 
     public void setFullname(String fullname) {
@@ -80,13 +64,12 @@ public class Customer implements Serializable {
     }
 
     public String getEmail() {
-        return this.email;
+        return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
-
 
     public static final class CustomerBuilder {
         private Long id;

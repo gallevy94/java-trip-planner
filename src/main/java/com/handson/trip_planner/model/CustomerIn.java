@@ -1,30 +1,31 @@
 package com.handson.trip_planner.model;
 
-import com.handson.trip_planner.model.Customer.CustomerBuilder;
+
 import com.handson.trip_planner.util.Dates;
 import java.io.Serializable;
 import org.hibernate.validator.constraints.Length;
 
+import static com.handson.trip_planner.model.Customer.CustomerBuilder.aCustomer;
+
 public class CustomerIn implements Serializable {
-    private @Length(
-            max = 60
-    ) String fullname;
+    @Length(max = 60)
+    private String fullname;
     private String email;
 
-    public CustomerIn() {
-    }
 
     public Customer toCustomer() {
-        return CustomerBuilder.aCustomer().createdAt(Dates.nowUTC()).fullname(this.fullname).email(this.email).build();
+        return aCustomer().createdAt(Dates.nowUTC()).fullname(fullname).email(email)
+                .build();
     }
 
     public void updateCustomer(Customer customer) {
-        customer.setFullname(this.fullname);
-        customer.setEmail(this.email);
+        customer.setFullname(fullname);
+        customer.setEmail(email);
     }
 
+
     public String getFullname() {
-        return this.fullname;
+        return fullname;
     }
 
     public void setFullname(String fullname) {
@@ -32,10 +33,11 @@ public class CustomerIn implements Serializable {
     }
 
     public String getEmail() {
-        return this.email;
+        return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
+
 }

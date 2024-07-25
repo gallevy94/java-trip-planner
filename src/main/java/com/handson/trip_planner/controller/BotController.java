@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
-@RequestMapping({"/bot"})
+@RequestMapping("/bot")
 public class BotController {
     @Value("${openai.model}")
     private String model;
@@ -28,16 +28,10 @@ public class BotController {
     @Autowired
     private RestTemplate template;
 
-    public BotController() {
-    }
-
-    @RequestMapping(
-            value = {"/gpt"},
-            method = {RequestMethod.GET}
-    )
+    @RequestMapping(value = {"/chat"}, method = {RequestMethod.GET})
     public ResponseEntity<?> getPrompt(@RequestParam String prompt) throws IOException {
-        ChatRequest request = new ChatRequest(this.model, prompt);
-        ChatResponse response = (ChatResponse)this.template.postForObject(this.apiURL, request, ChatResponse.class, new Object[0]);
-        return new ResponseEntity(((ChatResponse.Choice)response.getChoices().get(0)).getMessage().getContent(), HttpStatus.OK);
+        ChatRequest request = new ChatRequest(model, prompt);
+        ChatResponse response = template.postForObject(apiURL, request, ChatResponse.class);
+        return new ResponseEntity<>(response.getChoices().get(0).getMessage().getContent(), HttpStatus.OK);
     }
 }

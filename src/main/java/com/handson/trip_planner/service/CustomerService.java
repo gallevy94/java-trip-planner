@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package com.handson.trip_planner.service;
 
 import com.handson.trip_planner.model.Customer;
@@ -16,22 +11,11 @@ public class CustomerService {
     @Autowired
     CustomerRepository repository;
 
-    public CustomerService() {
-    }
+    public Iterable<Customer> all() {return repository.findAll();}
 
-    public Iterable<Customer> all() {
-        return this.repository.findAll();
-    }
+    public Optional<Customer> findById(Long id) {return repository.findById(id);}
 
-    public Optional<Customer> findById(Long id) {
-        return this.repository.findById(id);
-    }
+    public Customer save(Customer customer) {return repository.save(customer);}
 
-    public Customer save(Customer customer) {
-        return (Customer)this.repository.save(customer);
-    }
-
-    public void delete(Customer customer) {
-        this.repository.delete(customer);
-    }
+    public void delete(Customer customer) {repository.delete(customer);}
 }

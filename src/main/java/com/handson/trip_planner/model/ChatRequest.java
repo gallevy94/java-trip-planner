@@ -9,12 +9,12 @@ public class ChatRequest {
 
     public ChatRequest(String model, String prompt) {
         this.model = model;
-        this.messages = new ArrayList();
+        this.messages = new ArrayList<>();
         this.messages.add(new ChatMessage("user", prompt));
     }
 
     public String getModel() {
-        return this.model;
+        return model;
     }
 
     public void setModel(String model) {
@@ -22,14 +22,10 @@ public class ChatRequest {
     }
 
     public List<ChatMessage> getMessages() {
-        return this.messages;
+        return messages;
     }
 
     public void setMessages(List<ChatMessage> messages) {
         this.messages = messages;
-    }
-
-    public String toString() {
-        return "ChatRequest{model='" + this.model + "', messages=" + this.messages + "}";
     }
 }

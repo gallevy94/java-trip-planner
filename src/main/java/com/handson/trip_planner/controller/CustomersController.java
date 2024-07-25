@@ -19,66 +19,46 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({"/api/customer"})
+@RequestMapping("/api/customer")
 public class CustomersController {
     @Autowired
     CustomerService customerService;
 
-    public CustomersController() {
-    }
-
-    @RequestMapping(
-            value = {""},
-            method = {RequestMethod.GET}
-    )
+    @RequestMapping(value = "", method = {RequestMethod.GET})
     public ResponseEntity<?> getAllCustomers() {
-        return new ResponseEntity(this.customerService.all(), HttpStatus.OK);
+        return new ResponseEntity<>(customerService.all(), HttpStatus.OK);
     }
 
-    @RequestMapping(
-            value = {"/{id}"},
-            method = {RequestMethod.GET}
-    )
+
+
+    @RequestMapping(value = "/{id}", method = {RequestMethod.GET})
     public ResponseEntity<?> getOneCustomer(@PathVariable Long id) {
-        return new ResponseEntity(this.customerService.findById(id), HttpStatus.OK);
+        return new ResponseEntity<>(customerService.findById(id), HttpStatus.OK);
     }
 
-    @RequestMapping(
-            value = {""},
-            method = {RequestMethod.POST}
-    )
+    @RequestMapping(value = "", method = {RequestMethod.POST})
     public ResponseEntity<?> insertCustomer(@RequestBody CustomerIn customerIn) {
         Customer customer = customerIn.toCustomer();
-        customer = this.customerService.save(customer);
-        return new ResponseEntity(customer, HttpStatus.OK);
+        customer = customerService.save(customer);
+        return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
-    @RequestMapping(
-            value = {"/{id}"},
-            method = {RequestMethod.PUT}
-    )
-    public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody CustomerIn student) {
-        Optional<Customer> dbCustomer = this.customerService.findById(id);
-        if (dbCustomer.isEmpty()) {
-            throw new RuntimeException("Customer with id: " + id + " not found");
-        } else {
-            student.updateCustomer((Customer)dbCustomer.get());
-            Customer updatedCustomer = this.customerService.save((Customer)dbCustomer.get());
-            return new ResponseEntity(updatedCustomer, HttpStatus.OK);
-        }
+    @RequestMapping(value = "/{id}", method = {RequestMethod.PUT})
+    public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody CustomerIn customer) {
+        Optional<Customer> dbCustomer = customerService.findById(id);
+        if (dbCustomer.isEmpty()) throw new RuntimeException("Customer with id: " + id + " not found");
+        customer.updateCustomer(dbCustomer.get());
+        Customer updatedCustomer = customerService.save(dbCustomer.get());
+        return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
     }
 
-    @RequestMapping(
-            value = {"/{id}"},
-            method = {RequestMethod.DELETE}
-    )
-    public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
-        Optional<Customer> dbCustomer = this.customerService.findById(id);
-        if (dbCustomer.isEmpty()) {
-            throw new RuntimeException("Customer with id: " + id + " not found");
-        } else {
-            this.customerService.delete((Customer)dbCustomer.get());
-            return new ResponseEntity("DELETED", HttpStatus.OK);
-        }
+    @RequestMapping(value = "/{id}", method = {RequestMethod.DELETE})
+    public ResponseEntity<?> deleteCustomer(@PathVariable Long id)
+    {
+        Optional<Customer> dbCustomer = customerService.findById(id);
+        if (dbCustomer.isEmpty()) throw new RuntimeException("Customer with id: " + id + " not found");
+        customerService.delete(dbCustomer.get());
+        return new ResponseEntity<>("DELETED", HttpStatus.OK);
+
     }
 }

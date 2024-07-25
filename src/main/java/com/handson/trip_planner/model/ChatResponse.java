@@ -5,26 +5,20 @@ import java.util.List;
 public class ChatResponse {
     private List<Choice> choices;
 
-    public ChatResponse() {
-    }
-
     public List<Choice> getChoices() {
-        return this.choices;
+        return choices;
     }
 
     public void setChoices(List<Choice> choices) {
         this.choices = choices;
     }
 
-    public class Choice {
+    public static class Choice {
         private int index;
         private ChatMessage message;
 
-        public Choice() {
-        }
-
         public int getIndex() {
-            return this.index;
+            return index;
         }
 
         public void setIndex(int index) {
@@ -32,7 +26,7 @@ public class ChatResponse {
         }
 
         public ChatMessage getMessage() {
-            return this.message;
+            return message;
         }
 
         public void setMessage(ChatMessage message) {
