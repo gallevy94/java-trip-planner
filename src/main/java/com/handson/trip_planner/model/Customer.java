@@ -5,13 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.handson.trip_planner.util.Dates;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
@@ -38,6 +35,12 @@ public class Customer implements Serializable {
     @Length(max = 60)
     private String fullname;
     private String email;
+    public Collection<CustomerTrip> getCustomerTrips() {
+        return customerTrips;
+    }
+
+    @OneToMany(mappedBy = "customer", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private Collection<CustomerTrip> customerTrips = new ArrayList<>();
 
     public Long getId() {
         return id;
