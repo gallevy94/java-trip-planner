@@ -3,6 +3,7 @@ package com.handson.trip_planner.controller;
 import com.handson.trip_planner.model.Customer;
 import com.handson.trip_planner.model.CustomerTrip;
 import com.handson.trip_planner.model.TripIn;
+import com.handson.trip_planner.service.BotService;
 import com.handson.trip_planner.service.CustomerService;
 import com.handson.trip_planner.service.CustomerTripService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.Optional;
-
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/customers")
 public class CustomersTripsController {
@@ -21,14 +24,45 @@ public class CustomersTripsController {
     @Autowired
     CustomerTripService customerTripService;
 
+    @Autowired
+    private BotService botService;
+
+    @RequestMapping(value = "/trip-plan", method = RequestMethod.POST)
+    public ResponseEntity<String> getTripPlan(@RequestParam String cityName, @RequestParam Integer tripDays, @RequestParam Long customerId, HttpSession session) throws IOException {
+
+        String prompt = "Plan me a simple " + tripDays + " days vacation in " + cityName + " with all kinds of activities (site seeing, restaurant, shopping, etc). Return only a JSON array of objects, each with fields for 'id' (starting with 1), 'color' (different color for each activity, pastel color and should be HEX code), 'lat' and 'lng', 'address', 'place' and 'description'. Do not include any other text or explanations or a '```json' text above.";
+        String tripPlan = botService.getPromptValue(prompt);
+
+        // Create and set the trip details in the session
+        TripIn tripIn = TripIn.TripInBuilder.aTripIn()
+                .cityName(cityName)
+                .tripDays(tripDays)
+                .tripPlan(tripPlan)
+                .build();
+        session.setAttribute("tripIn_" + customerId, tripIn);
+
+        return new ResponseEntity<>(tripPlan, HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/{customerId}/trips", method = RequestMethod.POST)
-    public ResponseEntity<?> insertCustomerTrip(Long customerId, @RequestBody TripIn tripIn)
-    {
+    public ResponseEntity<?> insertCustomerTrip(@PathVariable Long customerId, HttpSession session) {
+
+        // Retrieve the TripIn object from session
+        TripIn tripIn = (TripIn) session.getAttribute("tripIn_" + customerId);
+        if (tripIn == null) {
+            return new ResponseEntity<>("Trip data not found in session.", HttpStatus.BAD_REQUEST);
+        }
+
         var customer = customerService.findById(customerId);
-        if (customer.isEmpty()) throw new RuntimeException("Customer:" + customerId +" not found");
+        if (customer.isEmpty()) {
+            throw new RuntimeException("Customer:" + customerId + " not found");
+        }
+
         CustomerTrip customerTrip = tripIn.toTrip(customer.get());
         customerTrip = customerTripService.save(customerTrip);
+
+        session.removeAttribute("tripIn_" + customerId);
+
         return new ResponseEntity<>(customerTrip, HttpStatus.OK);
     }
 

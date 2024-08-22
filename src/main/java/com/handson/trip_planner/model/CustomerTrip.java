@@ -3,10 +3,8 @@ package com.handson.trip_planner.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import com.handson.trip_planner.util.Dates;
 import org.hibernate.validator.constraints.Length;
-import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
@@ -14,24 +12,32 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="customer_trip")
 public class CustomerTrip implements Serializable {
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
     @NotNull
     @Column(nullable = false, updatable = false)
-    private Date createdAt = Dates.nowUTC();
+    private LocalDateTime createdAt;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("createdAt")
-    public LocalDateTime calcCreatedAt() {
-        return Dates.atLocalTime(createdAt);
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
     }
 
     @JsonIgnore
@@ -44,10 +50,13 @@ public class CustomerTrip implements Serializable {
     @Length(max = 60)
     private String cityName;
 
-
     @Min(1)
     @Max(50)
     private Integer tripDays;
+
+    @Column(name = "trip_plan", columnDefinition = "jsonb")
+    private String tripPlan;
+
 
     public Long getId() {
         return id;
@@ -57,11 +66,7 @@ public class CustomerTrip implements Serializable {
         this.id = id;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -89,12 +94,21 @@ public class CustomerTrip implements Serializable {
         this.tripDays = tripDays;
     }
 
+    public String getTripPlan() {
+        return tripPlan;
+    }
+
+    public void setTripPlan(String tripPlan) {
+        this.tripPlan = tripPlan;
+    }
+
     public static final class CustomerTripBuilder {
         private Long id;
-        private Date createdAt = Dates.nowUTC();
+        private LocalDateTime createdAt;
         private Customer customer;
         private String cityName;
         private Integer tripDays;
+        private String tripPlan;
 
         private CustomerTripBuilder() {
         }
@@ -108,7 +122,7 @@ public class CustomerTrip implements Serializable {
             return this;
         }
 
-        public CustomerTripBuilder createdAt(Date createdAt) {
+        public CustomerTripBuilder createdAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
         }
@@ -128,13 +142,19 @@ public class CustomerTrip implements Serializable {
             return this;
         }
 
+        public CustomerTripBuilder tripPlan(String tripPlan) {
+            this.tripPlan = tripPlan;
+            return this;
+        }
+
         public CustomerTrip build() {
             CustomerTrip customerTrip = new CustomerTrip();
-            customerTrip.customer = this.customer;
-            customerTrip.cityName = this.cityName;
-            customerTrip.tripDays = this.tripDays;
-            customerTrip.id = this.id;
-            customerTrip.createdAt = this.createdAt;
+            customerTrip.setId(id);
+            customerTrip.setCreatedAt(createdAt);
+            customerTrip.setCustomer(customer);
+            customerTrip.setCityName(cityName);
+            customerTrip.setTripDays(tripDays);
+            customerTrip.setTripPlan(tripPlan);
             return customerTrip;
         }
     }
