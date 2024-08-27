@@ -29,8 +29,6 @@ public class CustomersController {
         return new ResponseEntity<>(customerService.all(), HttpStatus.OK);
     }
 
-
-
     @RequestMapping(value = "/{id}", method = {RequestMethod.GET})
     public ResponseEntity<?> getOneCustomer(@PathVariable Long id) {
         return new ResponseEntity<>(customerService.findById(id), HttpStatus.OK);

@@ -27,7 +27,18 @@
 //
 //    @PostMapping("/chat")
 //    public ResponseEntity<String> getTripFromUser(@RequestParam String cityName, @RequestParam Integer tripDays) throws IOException {
-//        var prompt = "Plan me a simple " + tripDays + "days vacation in " + cityName + "with all kinds of activities (site seeing, restaurant, shopping .etc) . Return only a JSON array of objects, each with fields for 'id' (starting with 1), 'color' (different color for each activity,pastel color and should be HEX code) 'lat' and 'lng', 'address', 'place' and 'description'. Do not include any other text or explanations or a '```json' text above.";
+//        var prompt = "I’m planning a trip to" + cityName + " from 12/9 until 15/9 and need an itinerary structured as an array of JSON objects. The structure should be as follows:\n" +
+//                "Day: id starting with 1. Should also include the date I provided, each day have a different date, and a summary description of what we're doing on each day.\n" +
+//                "For each day:\n" +
+//                "Activities: A list of activities (such as sightseeing, restaurants, shopping, etc.) with the following details:\n" +
+//                "id: A unique identifier for each activity starting from 1.\n" +
+//                "color: A unique pastel color (in HEX code) for each activity.\n" +
+//                "lat: Latitude of the activity.\n" +
+//                "lng: Longitude of the activity.\n" +
+//                "address: The full address of the activity.\n" +
+//                "place: The name of the place.\n" +
+//                "description: A brief description of the activity.\n" +
+//                "Please generate a sample itinerary based on the structure above. Include a variety of activities for each day and ensure each activity has a different color. Do not include any other text or explanations or a '```json' text above.";
 //        return new ResponseEntity<>(botService.getPromptValue(prompt), HttpStatus.OK);
 //    }
 //}
