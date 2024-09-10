@@ -3,7 +3,6 @@ package com.handson.trip_planner.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.handson.trip_planner.util.Dates;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name="customer_trip")
-public class CustomerTrip implements Serializable {
+public class Trip implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -57,6 +56,8 @@ public class CustomerTrip implements Serializable {
     @Column(name = "trip_plan", columnDefinition = "jsonb")
     private String tripPlan;
 
+    @Column(name = "routes", columnDefinition = "jsonb")
+    private String routes;
 
     public Long getId() {
         return id;
@@ -102,60 +103,76 @@ public class CustomerTrip implements Serializable {
         this.tripPlan = tripPlan;
     }
 
-    public static final class CustomerTripBuilder {
+    public String getRoutes() {
+        return routes;
+    }
+
+    public void setRoutes(String routes) {
+        this.routes = routes;
+    }
+
+
+    public static final class TripBuilder {
         private Long id;
-        private LocalDateTime createdAt;
-        private Customer customer;
-        private String cityName;
-        private Integer tripDays;
+        private @NotNull LocalDateTime createdAt;
+        private @NotNull Customer customer;
+        private @NotEmpty @Length(max = 60) String cityName;
+        private @Min(1) @Max(50) Integer tripDays;
         private String tripPlan;
+        private String routes;
 
-        private CustomerTripBuilder() {
+        private TripBuilder() {
         }
 
-        public static CustomerTripBuilder aCustomerTrip() {
-            return new CustomerTripBuilder();
+        public static TripBuilder aTrip() {
+            return new TripBuilder();
         }
 
-        public CustomerTripBuilder id(Long id) {
+        public TripBuilder id(Long id) {
             this.id = id;
             return this;
         }
 
-        public CustomerTripBuilder createdAt(LocalDateTime createdAt) {
+        public TripBuilder createdAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
         }
 
-        public CustomerTripBuilder customer(Customer customer) {
+        public TripBuilder customer(Customer customer) {
             this.customer = customer;
             return this;
         }
 
-        public CustomerTripBuilder cityName(String cityName) {
+        public TripBuilder cityName(String cityName) {
             this.cityName = cityName;
             return this;
         }
 
-        public CustomerTripBuilder tripDays(Integer tripDays) {
+        public TripBuilder tripDays(Integer tripDays) {
             this.tripDays = tripDays;
             return this;
         }
 
-        public CustomerTripBuilder tripPlan(String tripPlan) {
+        public TripBuilder tripPlan(String tripPlan) {
             this.tripPlan = tripPlan;
             return this;
         }
 
-        public CustomerTrip build() {
-            CustomerTrip customerTrip = new CustomerTrip();
-            customerTrip.setId(id);
-            customerTrip.setCreatedAt(createdAt);
-            customerTrip.setCustomer(customer);
-            customerTrip.setCityName(cityName);
-            customerTrip.setTripDays(tripDays);
-            customerTrip.setTripPlan(tripPlan);
-            return customerTrip;
+        public TripBuilder routes(String routes) {
+            this.routes = routes;
+            return this;
+        }
+
+        public Trip build() {
+            Trip trip = new Trip();
+            trip.setId(id);
+            trip.setCreatedAt(createdAt);
+            trip.setCustomer(customer);
+            trip.setCityName(cityName);
+            trip.setTripDays(tripDays);
+            trip.setTripPlan(tripPlan);
+            trip.setRoutes(routes);
+            return trip;
         }
     }
 }
