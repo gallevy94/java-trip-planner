@@ -13,6 +13,8 @@ import com.google.maps.model.DirectionsResult;
 
 import org.json.JSONArray;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,6 +94,17 @@ public class MapService {
             }
         }
         return null;
+    }
+
+    public String getDirections(double originLat, double originLng, double destinationLat, double destinationLng, String waypoints) {
+        String url = "https://maps.googleapis.com/maps/api/directions/json?"
+                + "origin=" + originLat + "," + originLng
+                + "&destination=" + destinationLat + "," + destinationLng
+                + (waypoints != null ? "&waypoints=" + waypoints : "")
+                + "&key=" + apiKey;
+
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForObject(url, String.class);
     }
 //
 //    public String getRoutesForTripPlan(String tripPlan) {

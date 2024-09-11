@@ -1,7 +1,7 @@
 package com.handson.trip_planner.model;
 
 
-import com.handson.trip_planner.util.Dates;
+import com.handson.trip_planner.utils.Dates;
 import java.io.Serializable;
 import org.hibernate.validator.constraints.Length;
 

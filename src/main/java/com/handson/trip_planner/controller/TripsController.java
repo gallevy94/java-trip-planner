@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/trip")
 public class TripsController {
     @Autowired
     CustomerService customerService;
@@ -38,7 +38,7 @@ public class TripsController {
     @RequestMapping(value = "/trip-plan", method = RequestMethod.POST)
     public ResponseEntity<TripResponse> getTripPlan(@RequestParam String cityName, @RequestParam String startDate, @RequestParam String endDate, @RequestParam Long customerId, HttpSession session) throws IOException {
 
-        String prompt = "I’m planning a trip to" + cityName + " from" + startDate + " until" + endDate + " and need an itinerary structured as an array of JSON objects. The structure should be as follows: days: The number of days I’ll be traveling. Should also include the date I provided, each day have a different date. For each day: activities: A list of activities (such as sightseeing, restaurants, shopping, etc.) with the following details: id: A unique identifier for each activity starting from 1. lat: Latitude of the activity. lng: Longitude of the activity. address: The full address of the activity. place: The name of the place. description: A brief description of the activity. Please generate an itinerary based on the structure above. Include a variety of activities for each day. Do not include any other text or explanations or a '```json' text above.";
+        String prompt = "I’m planning a trip to" + cityName + " from" + startDate + " until" + endDate + " and need an itinerary structured as an array of JSON objects. The structure should be as follows: id: A unique identifier for each activity starting from 0. Should also include the date I provided, each day have a different date in DD/MM format and a summary on what we are doing on each day. For each day: activities: A list of activities (such as sightseeing, restaurants, shopping, etc.) with the following details: id: A unique identifier for each activity starting from 0, continue the count for each activity, don't reset the count back to 0. time: 'startTime-EndTime' , time in a day to visit the activity. lat: Latitude of the activity. lng: Longitude of the activity. address: The full address of the activity. place: The name of the place. description: A brief description of the activity. Please generate an itinerary based on the structure above. Include a variety of activities for each day. Do not include any other text or explanations or a '```json' text above.";
         String tripPlan = botService.getPromptValue(prompt);
         List<List<LatLng>> coordinates = mapService.extractCoordinatesFromPlan(tripPlan);
         List<String> imagesUrls = mapService.getImageUrlsForPlaces(tripPlan, cityName);

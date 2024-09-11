@@ -2,7 +2,7 @@ package com.handson.trip_planner.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.handson.trip_planner.util.Dates;
+import com.handson.trip_planner.utils.Dates;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;

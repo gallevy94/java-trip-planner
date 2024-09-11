@@ -34,6 +34,17 @@ public class DBUser implements Serializable, Persistable<Long> {
     }
 
 
+    @Column(nullable = true, length = 50)
+    private String googleId;
+
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
+
     @Column(nullable = false, length = 60)
     private String name;
 

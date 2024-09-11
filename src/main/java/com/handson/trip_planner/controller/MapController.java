@@ -1,29 +1,32 @@
-//package com.handson.trip_planner.controller;
-//
-//import com.handson.trip_planner.model.TripIn;
-//import com.handson.trip_planner.service.MapService;
-//import org.hibernate.mapping.Map;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.*;
-//import org.json.JSONObject;
-//
-//import java.io.IOException;
-//
-//@RestController
-//@CrossOrigin(origins = "http://localhost:3000")
-//public class MapController {
-//
-//    private final MapService mapService;
-//
-//    public MapController(MapService geocodingService) {
-//        this.mapService = geocodingService;
-//    }
-//
-//
-//    @RequestMapping(value = "/getCoordinates", method = RequestMethod.POST)
-//    public ResponseEntity<String> getCoordinates(@RequestParam String trip) throws IOException {
-//        String locations = mapService.getRoutesForTripPlan(trip);
-//        return new ResponseEntity<>(locations, HttpStatus.OK);
-//    }
-//}
+package com.handson.trip_planner.controller;
+import com.handson.trip_planner.service.MapService;
+import com.handson.trip_planner.service.TripService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+
+@CrossOrigin(origins = "http://localhost:3000")
+@RestController
+@RequestMapping("/api/map")
+public class MapController {
+
+    @Autowired
+    MapService mapService;
+
+    @RequestMapping(value = "/directions", method = RequestMethod.GET)
+    public ResponseEntity<String> getDirections(
+            @RequestParam double originLat,
+            @RequestParam double originLng,
+            @RequestParam double destinationLat,
+            @RequestParam double destinationLng,
+            @RequestParam(required = false) String waypoints) {
+
+        System.out.println("directions");
+        String result = mapService.getDirections(originLat, originLng, destinationLat, destinationLng, waypoints);
+        System.out.println("result");
+        System.out.println(result);
+
+        return ResponseEntity.ok(result);
+    }
+}

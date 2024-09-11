@@ -3,7 +3,7 @@
 // (powered by FernFlower decompiler)
 //
 
-package com.handson.trip_planner.util;
+package com.handson.trip_planner.utils;
 
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;

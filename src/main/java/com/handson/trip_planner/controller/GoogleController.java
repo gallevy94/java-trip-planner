@@ -1,0 +1,94 @@
+package com.handson.trip_planner.controller;
+
+import com.handson.trip_planner.jwt.DBUser;
+import com.handson.trip_planner.jwt.DBUserService;
+import com.handson.trip_planner.security.CurrentUser;
+import com.handson.trip_planner.security.TokenProvider;
+import com.sun.security.auth.UserPrincipal;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
+
+@RestController
+public class GoogleController {
+
+    @Autowired
+    TokenProvider tokenProvider;
+
+    @Autowired
+    DBUserService userService;
+
+    @GetMapping("/google1")
+    public String getCurrentUser(@CurrentUser UserPrincipal userPrincipal, @RequestParam(required = false) String token) {
+        if (userPrincipal != null) {
+            System.out.println("***************  " + userPrincipal.getId());
+            userService.findUserName(userPrincipal.getName())
+                    .orElseThrow(() -> new Exception("User id" + userPrincipal.getId()));
+
+        }
+        if (token != null) {
+            tokenProvider.validateToken(token);
+            String username = tokenProvider.getUserNameFromToken(token);
+            Optional<DBUser> userOpt = userService.findUserById(Long.parseLong(username));
+            return "user:" +  userOpt.get().getName()  +
+                    " id:" + userOpt.get().getGoogleId() ;
+
+        }
+        return "no user";
+    }
+    @GetMapping("/google")
+    public ModelAndView index(HttpServletRequest httpRequest, Model model, @RequestParam(required = false) String token) throws Exception {
+        if (token != null) {
+            tokenProvider.validateToken(token);
+            String username = tokenProvider.getUserNameFromToken(token);
+            Optional<DBUser> userOpt = userService.findUserById(Long.parseLong(username));
+            if (userOpt.isPresent()) {
+                Authentication authentication=        new UsernamePasswordAuthenticationToken(
+                        userOpt.get().getName(),
+                        "1111"
+                );
+
+                String newToken = tokenProvider.createToken(authentication);
+                return new ModelAndView("redirect:https://juniorsplease.com/dologin?token=" + newToken + "&username=" + userOpt.get().getName());
+            }
+
+
+        }
+        throw new Exception("token invalid or user not found");
+    }
+
+    @GetMapping("/googlelocal")
+    public ModelAndView index1(HttpServletRequest httpRequest, Model model, @RequestParam(required = false) String token) throws Exception {
+        if (token != null) {
+            tokenProvider.validateToken(token);
+            String username = tokenProvider.getUserNameFromToken(token);
+            Optional<DBUser> userOpt = userService.findById(Long.parseLong(username));
+            if (userOpt.isPresent()) {
+                Authentication authentication=        new UsernamePasswordAuthenticationToken(
+                        userOpt.get().getName(),
+                        "1111"
+                );
+
+                String newToken = tokenProvider.createToken(authentication);
+                return new ModelAndView("redirect:http://localhost:4200/dologin?token=" + newToken + "&username=" + userOpt.get().getName());
+            }
+
+
+        }
+        throw new Exception("token invalid or user not found");
+    }
+
+
+}
