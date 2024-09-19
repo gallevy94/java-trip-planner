@@ -53,7 +53,9 @@ public class Trip implements Serializable {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @NotEmpty
+    @Length(max = 60)
+    private String location;
+
     @Length(max = 60)
     private String cityName;
 
@@ -144,12 +146,21 @@ public class Trip implements Serializable {
         this.imagesUrls = imagesUrls;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
 
     public static final class TripBuilder {
         private Long id;
         private @NotNull LocalDateTime createdAt;
         private @NotNull Customer customer;
-        private @NotEmpty @Length(max = 60) String cityName;
+        private @Length(max = 60) String location;
+        private @Length(max = 60) String cityName;
         private @NotEmpty String startDate;
         private @NotEmpty String endDate;
         private String tripPlan;
@@ -178,6 +189,11 @@ public class Trip implements Serializable {
             return this;
         }
 
+        public TripBuilder location(String location) {
+            this.location = location;
+            return this;
+        }
+
         public TripBuilder cityName(String cityName) {
             this.cityName = cityName;
             return this;
@@ -198,7 +214,7 @@ public class Trip implements Serializable {
             return this;
         }
 
-        public TripBuilder coordinates(List<List<LatLng>>coordinates) {
+        public TripBuilder coordinates(List<List<LatLng>> coordinates) {
             this.coordinates = coordinates;
             return this;
         }
@@ -213,6 +229,7 @@ public class Trip implements Serializable {
             trip.setId(id);
             trip.setCreatedAt(createdAt);
             trip.setCustomer(customer);
+            trip.setLocation(location);
             trip.setCityName(cityName);
             trip.setStartDate(startDate);
             trip.setEndDate(endDate);

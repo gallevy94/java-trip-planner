@@ -15,7 +15,8 @@ import static com.handson.trip_planner.model.Trip.TripBuilder.aTrip;
 
 public class TripIn {
 
-    @NotEmpty
+    @Length(max = 60)
+    private String location;
     @Length(max = 60)
     private String cityName;
 
@@ -41,6 +42,7 @@ public class TripIn {
     public Trip toTrip(Customer customer) {
         return aTrip()
                 .customer(customer)
+                .location(location)
                 .cityName(cityName)
                 .startDate(startDate)
                 .endDate(endDate)
@@ -100,9 +102,18 @@ public class TripIn {
         this.imagesUrls = imagesUrls;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
 
     public static final class TripInBuilder {
-        private @NotEmpty @Length(max = 60) String cityName;
+        private @Length(max = 60) String location;
+        private @Length(max = 60) String cityName;
         private @NotEmpty String startDate;
         private @NotEmpty String endDate;
         private String tripPlan;
@@ -114,6 +125,11 @@ public class TripIn {
 
         public static TripInBuilder aTripIn() {
             return new TripInBuilder();
+        }
+
+        public TripInBuilder location(String location) {
+            this.location = location;
+            return this;
         }
 
         public TripInBuilder cityName(String cityName) {
@@ -148,6 +164,7 @@ public class TripIn {
 
         public TripIn build() {
             TripIn tripIn = new TripIn();
+            tripIn.setLocation(location);
             tripIn.setCityName(cityName);
             tripIn.setStartDate(startDate);
             tripIn.setEndDate(endDate);

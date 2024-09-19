@@ -16,11 +16,13 @@ public class TripService {
     public Iterable<Trip> all() {
         return repository.findAll();
     }
-
     public Optional<Trip> findById(Long id) {
         return repository.findById(id);
     }
 
+    public Optional<Trip> findExistingTrip(String location, String startDate, String endDate) {
+        return repository.findTrip(location, startDate, endDate);
+    }
 
     public Trip save(Trip trip) {
         return repository.save(trip);
