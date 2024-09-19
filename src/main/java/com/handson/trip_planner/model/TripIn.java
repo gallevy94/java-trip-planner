@@ -1,11 +1,15 @@
 package com.handson.trip_planner.model;
 
+import com.google.maps.model.LatLng;
+//import com.handson.trip_planner.utils.LatLngListConverter;
+//import com.handson.trip_planner.utils.CoordinatesConverter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+
+import java.util.List;
 
 import static com.handson.trip_planner.model.Trip.TripBuilder.aTrip;
 
@@ -15,37 +19,61 @@ public class TripIn {
     @Length(max = 60)
     private String cityName;
 
-    @Min(1)
-    @Max(20)
-    private Integer tripDays;
+    @NotEmpty
+    private String startDate;
 
-    @Column(name = "trip_plan", columnDefinition = "jsonb")
+    @NotEmpty
+    private String endDate;
+
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private String tripPlan;
 
-    @Column(name = "routes", columnDefinition = "jsonb")
-    private String routes;
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    private List<List<LatLng>> coordinates;
 
+
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    private List<String> imagesUrls;
 
     public Trip toTrip(Customer customer) {
         return aTrip()
                 .customer(customer)
                 .cityName(cityName)
-                .tripDays(tripDays)
+                .startDate(startDate)
+                .endDate(endDate)
                 .tripPlan(tripPlan)
+                .coordinates(coordinates)
+                .imagesUrls(imagesUrls)
                 .build();
     }
 
-    public void updateCustomerTrip(Trip trip) {
-        trip.setCityName(cityName);
-        trip.setTripDays(tripDays);
-    }
+    public void updateCustomerTrip(Trip trip) {}
 
     public String getCityName() {
         return cityName;
     }
 
-    public Integer getTripDays() {
-        return tripDays;
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public String getTripPlan() {
@@ -56,11 +84,30 @@ public class TripIn {
         this.tripPlan = tripPlan;
     }
 
+    public List<List<LatLng>> getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(List<List<LatLng>> coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public List<String> getImagesUrls() {
+        return imagesUrls;
+    }
+
+    public void setImagesUrls(List<String> imagesUrls) {
+        this.imagesUrls = imagesUrls;
+    }
+
+
     public static final class TripInBuilder {
         private @NotEmpty @Length(max = 60) String cityName;
-        private @Min(1) @Max(20) Integer tripDays;
+        private @NotEmpty String startDate;
+        private @NotEmpty String endDate;
         private String tripPlan;
-        private String routes;
+        private List<List<LatLng>> coordinates;
+        private List<String> imagesUrls;
 
         private TripInBuilder() {
         }
@@ -74,8 +121,13 @@ public class TripIn {
             return this;
         }
 
-        public TripInBuilder tripDays(Integer tripDays) {
-            this.tripDays = tripDays;
+        public TripInBuilder startDate(String startDate) {
+            this.startDate = startDate;
+            return this;
+        }
+
+        public TripInBuilder endDate(String endDate) {
+            this.endDate = endDate;
             return this;
         }
 
@@ -84,17 +136,24 @@ public class TripIn {
             return this;
         }
 
-        public TripInBuilder routes(String routes) {
-            this.routes = routes;
+        public TripInBuilder coordinates(List<List<LatLng>> coordinates) {
+            this.coordinates = coordinates;
+            return this;
+        }
+
+        public TripInBuilder imagesUrls(List<String> imagesUrls) {
+            this.imagesUrls = imagesUrls;
             return this;
         }
 
         public TripIn build() {
             TripIn tripIn = new TripIn();
+            tripIn.setCityName(cityName);
+            tripIn.setStartDate(startDate);
+            tripIn.setEndDate(endDate);
             tripIn.setTripPlan(tripPlan);
-            tripIn.tripDays = this.tripDays;
-            tripIn.routes = this.routes;
-            tripIn.cityName = this.cityName;
+            tripIn.setCoordinates(coordinates);
+            tripIn.setImagesUrls(imagesUrls);
             return tripIn;
         }
     }

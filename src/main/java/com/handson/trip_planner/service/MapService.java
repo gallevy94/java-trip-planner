@@ -3,18 +3,16 @@ package com.handson.trip_planner.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.LatLng;
+
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.json.JSONObject;
-import com.google.maps.DirectionsApi;
-import com.google.maps.GeoApiContext;
-import com.google.maps.model.DirectionsResult;
+
 
 import org.json.JSONArray;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,6 +151,7 @@ public class MapService {
 
         return dailyCoordinates;
     }
+
 
 
 

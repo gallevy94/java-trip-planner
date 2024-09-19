@@ -3,16 +3,24 @@ package com.handson.trip_planner.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.maps.model.LatLng;
+//import com.handson.trip_planner.utils.LatLngListConverter;
+//import com.handson.trip_planner.utils.CoordinatesConverter;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-
+import java.util.List;
+@TypeDefs({
+        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+})
 @Entity
 @Table(name="customer_trip")
 public class Trip implements Serializable {
@@ -42,22 +50,31 @@ public class Trip implements Serializable {
     @JsonIgnore
     @NotNull
     @ManyToOne(optional = false)
-    @JoinColumn(name = "customerId")
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @NotEmpty
     @Length(max = 60)
     private String cityName;
 
-    @Min(1)
-    @Max(50)
-    private Integer tripDays;
+    @NotEmpty
+    private String startDate;
 
-    @Column(name = "trip_plan", columnDefinition = "jsonb")
+    @NotEmpty
+    private String endDate;
+
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private String tripPlan;
 
-    @Column(name = "routes", columnDefinition = "jsonb")
-    private String routes;
+   @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    private List<List<LatLng>> coordinates;
+
+
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    private List<String> imagesUrls;
 
     public Long getId() {
         return id;
@@ -87,12 +104,20 @@ public class Trip implements Serializable {
         this.cityName = cityName;
     }
 
-    public Integer getTripDays() {
-        return tripDays;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setTripDays(Integer tripDays) {
-        this.tripDays = tripDays;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public String getTripPlan() {
@@ -103,12 +128,20 @@ public class Trip implements Serializable {
         this.tripPlan = tripPlan;
     }
 
-    public String getRoutes() {
-        return routes;
+    public List<List<LatLng>>getCoordinates() {
+        return coordinates;
     }
 
-    public void setRoutes(String routes) {
-        this.routes = routes;
+    public void setCoordinates(List<List<LatLng>> coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public List<String> getImagesUrls() {
+        return imagesUrls;
+    }
+
+    public void setImagesUrls(List<String> imagesUrls) {
+        this.imagesUrls = imagesUrls;
     }
 
 
@@ -117,9 +150,11 @@ public class Trip implements Serializable {
         private @NotNull LocalDateTime createdAt;
         private @NotNull Customer customer;
         private @NotEmpty @Length(max = 60) String cityName;
-        private @Min(1) @Max(50) Integer tripDays;
+        private @NotEmpty String startDate;
+        private @NotEmpty String endDate;
         private String tripPlan;
-        private String routes;
+        private List<List<LatLng>> coordinates;
+        private List<String> imagesUrls;
 
         private TripBuilder() {
         }
@@ -148,8 +183,13 @@ public class Trip implements Serializable {
             return this;
         }
 
-        public TripBuilder tripDays(Integer tripDays) {
-            this.tripDays = tripDays;
+        public TripBuilder startDate(String startDate) {
+            this.startDate = startDate;
+            return this;
+        }
+
+        public TripBuilder endDate(String endDate) {
+            this.endDate = endDate;
             return this;
         }
 
@@ -158,8 +198,13 @@ public class Trip implements Serializable {
             return this;
         }
 
-        public TripBuilder routes(String routes) {
-            this.routes = routes;
+        public TripBuilder coordinates(List<List<LatLng>>coordinates) {
+            this.coordinates = coordinates;
+            return this;
+        }
+
+        public TripBuilder imagesUrls(List<String> imagesUrls) {
+            this.imagesUrls = imagesUrls;
             return this;
         }
 
@@ -169,9 +214,11 @@ public class Trip implements Serializable {
             trip.setCreatedAt(createdAt);
             trip.setCustomer(customer);
             trip.setCityName(cityName);
-            trip.setTripDays(tripDays);
+            trip.setStartDate(startDate);
+            trip.setEndDate(endDate);
             trip.setTripPlan(tripPlan);
-            trip.setRoutes(routes);
+            trip.setCoordinates(coordinates);
+            trip.setImagesUrls(imagesUrls);
             return trip;
         }
     }

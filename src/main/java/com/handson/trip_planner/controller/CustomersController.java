@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/customer")
+@RequestMapping("/customer")
 public class CustomersController {
     @Autowired
     CustomerService customerService;
