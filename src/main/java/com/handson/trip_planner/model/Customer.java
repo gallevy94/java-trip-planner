@@ -34,12 +34,12 @@ public class Customer implements Serializable {
     @Length(max = 60)
     private String fullname;
     private String email;
-    public Collection<Trip> getCustomerTrips() {
-        return trips;
-    }
-
-    @OneToMany(mappedBy = "customer", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-    private Collection<Trip> trips = new ArrayList<>();
+//    public Collection<Trip> getCustomerTrips() {
+//        return trips;
+//    }
+//
+//    @OneToMany(mappedBy = "customer", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+//    private Collection<Trip> trips = new ArrayList<>();
 
     public Long getId() {
         return id;

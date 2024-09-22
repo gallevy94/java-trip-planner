@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.maps.model.LatLng;
 //import com.handson.trip_planner.utils.LatLngListConverter;
 //import com.handson.trip_planner.utils.CoordinatesConverter;
+import com.handson.trip_planner.jwt.DBUser;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -22,7 +23,7 @@ import java.util.List;
         @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 })
 @Entity
-@Table(name="customer_trip")
+@Table(name="trip")
 public class Trip implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -50,8 +51,8 @@ public class Trip implements Serializable {
     @JsonIgnore
     @NotNull
     @ManyToOne(optional = false)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    @JoinColumn(name = "user_id", nullable = false)
+    private DBUser dbUser;
 
     @Length(max = 60)
     private String location;
@@ -90,12 +91,12 @@ public class Trip implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public DBUser getDBuser() {
+        return dbUser;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setDBUser(DBUser dbUser) {
+        this.dbUser = dbUser;
     }
 
     public String getCityName() {
@@ -158,7 +159,7 @@ public class Trip implements Serializable {
     public static final class TripBuilder {
         private Long id;
         private @NotNull LocalDateTime createdAt;
-        private @NotNull Customer customer;
+        private @NotNull DBUser dbUser;
         private @Length(max = 60) String location;
         private @Length(max = 60) String cityName;
         private @NotEmpty String startDate;
@@ -184,8 +185,8 @@ public class Trip implements Serializable {
             return this;
         }
 
-        public TripBuilder customer(Customer customer) {
-            this.customer = customer;
+        public TripBuilder dbUser(DBUser dbUser) {
+            this.dbUser = dbUser;
             return this;
         }
 
@@ -228,7 +229,6 @@ public class Trip implements Serializable {
             Trip trip = new Trip();
             trip.setId(id);
             trip.setCreatedAt(createdAt);
-            trip.setCustomer(customer);
             trip.setLocation(location);
             trip.setCityName(cityName);
             trip.setStartDate(startDate);
@@ -236,6 +236,7 @@ public class Trip implements Serializable {
             trip.setTripPlan(tripPlan);
             trip.setCoordinates(coordinates);
             trip.setImagesUrls(imagesUrls);
+            trip.dbUser = this.dbUser;
             return trip;
         }
     }

@@ -2,11 +2,15 @@ package com.handson.trip_planner.jwt;
 
 
 import com.google.common.base.MoreObjects;
+import com.handson.trip_planner.model.Trip;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -15,6 +19,16 @@ public class DBUser implements Serializable, Persistable<Long> {
     private static final long serialVersionUID = -5554304839188669754L;
 
     protected Long id;
+
+//    public Collection<Trip> getUsersTrips() {
+//        return trips;
+//    }
+//
+//    @OneToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+//    private Collection<Trip> trips = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Trip> trips;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,7 +66,7 @@ public class DBUser implements Serializable, Persistable<Long> {
     @Column(nullable = false, length = 255)
     private String password;
 
-    protected DBUser() {
+    public DBUser() {
     }
 
     @Transient

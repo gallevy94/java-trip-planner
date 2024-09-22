@@ -1,5 +1,6 @@
 package com.handson.trip_planner.jwt;
 
+import com.handson.trip_planner.model.Trip;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,13 +9,13 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-
+@CrossOrigin(origins = "*")
 @RestController
-@CrossOrigin
 public class JwtAuthenticationController {
 
     @Autowired
@@ -36,10 +37,16 @@ public class JwtAuthenticationController {
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+        System.out.println("*******Received login request for user: " + authenticationRequest.getUsername());
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(token));
+
+        Long userId = userService.findUserName(authenticationRequest.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"))
+                .getId();
+
+        return ResponseEntity.ok(new JwtResponse(token, userId));
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
@@ -49,7 +56,12 @@ public class JwtAuthenticationController {
                 .password(encodedPass).build();
         userService.save(user);
         UserDetails userDetails = new User(userRequest.getUsername(), encodedPass, new ArrayList<>());
-        return ResponseEntity.ok(new JwtResponse(jwtTokenUtil.generateToken(userDetails)));
+
+//        Long userId = userService.findUserName(userRequest.getUsername())
+//                .orElseThrow(() -> new UsernameNotFoundException("User not found"))
+//                .getId();
+
+        return ResponseEntity.ok(new JwtResponse(jwtTokenUtil.generateToken(userDetails), user.getId()));
     }
 
     private void authenticate(String username, String password) throws Exception {

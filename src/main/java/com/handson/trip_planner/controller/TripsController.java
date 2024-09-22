@@ -1,6 +1,8 @@
 package com.handson.trip_planner.controller;
 
 import com.google.maps.model.LatLng;
+import com.handson.trip_planner.jwt.DBUser;
+import com.handson.trip_planner.jwt.DBUserService;
 import com.handson.trip_planner.model.*;
 import com.handson.trip_planner.service.BotService;
 import com.handson.trip_planner.service.CustomerService;
@@ -14,13 +16,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/trip")
 public class TripsController {
     @Autowired
-    CustomerService customerService;
+    DBUserService userService;
 
     @Autowired
     BotService botService;
@@ -32,7 +35,7 @@ public class TripsController {
     MapService mapService;
 
     @RequestMapping(value = "/trip-plan", method = RequestMethod.POST)
-    public ResponseEntity<TripResponse> getTripPlan(@RequestParam String location, @RequestParam String startDate, @RequestParam String endDate, @RequestParam Long customerId, HttpSession session) throws IOException {
+    public ResponseEntity<TripResponse> getTripPlan(@RequestParam String location, @RequestParam String startDate, @RequestParam String endDate, @RequestParam Long userId, HttpSession session) throws IOException {
 
         // Check if the trip already exists in the database
         Optional<Trip> existingTrip = tripService.findExistingTrip(location, startDate, endDate);
@@ -42,7 +45,7 @@ public class TripsController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
-        String prompt = "I’m planning a trip to" + location + " from" + startDate + " until" + endDate + " and need an itinerary structured as an array of JSON objects. The structure should be as follows: id: A unique identifier for each activity starting from 0. Should also include the date I provided, each day have a different date in DD/MM format and a summary on what we are doing on each day. For each day: activities: A list of activities (such as sightseeing, restaurants, shopping, etc.) with the following details: id: A unique identifier for each activity starting from 0, continue the count for each activity, don't reset the count back to 0. time: 'startTime-EndTime' , time in a day to visit the activity. lat: Latitude of the activity. lng: Longitude of the activity. address: The full address of the activity. place: The name of the place. description: A brief description of the activity. Please generate an itinerary based on the structure above. Include a variety of activities for each day. Do not include any other text or explanations or a '```json' text above.";
+        String prompt = "I’m planning a trip to" + location + " from" + startDate + " until" + endDate + " and need an itinerary structured as an array of JSON objects. The structure should be as follows: id: A unique identifier for each activity starting from 0. Should also include the date I provided, each day have a different date in DD/MM format and a summary on what we are doing on each day. For each day: activities: A list of activities (such as sightseeing, restaurants, shopping, etc.) with the following details: id: A unique identifier for each activity starting from 0, continue the count for each activity, don't reset the count back to 0. time: 'startTime AM/PM - EndTime AM/PM' , time in a day to visit the activity. lat: Latitude of the activity. lng: Longitude of the activity. address: The full address of the activity. place: The name of the place. description: A brief description of the activity. Please generate an itinerary based on the structure above. Include a variety of activities for each day. Do not include any other text or explanations or a '```json' text above.";
         String tripPlan = botService.getPromptValue(prompt);
         List<List<LatLng>> coordinates = mapService.extractCoordinatesFromPlan(tripPlan);
         List<String> imagesUrls = mapService.getImageUrlsForPlaces(tripPlan, location);
@@ -62,12 +65,12 @@ public class TripsController {
                 .coordinates(coordinates)
                 .imagesUrls(imagesUrls)
                 .build();
-        session.setAttribute("tripIn_" + customerId, tripIn);
+//        session.setAttribute("tripIn_" + customerId, tripIn);
 
         //saves trip
-        var customer = customerService.findById(customerId);
-        Trip trip = tripIn.toTrip(customer.get());
-        trip = tripService.save(trip);
+        var dbUser = userService.findUserById(userId);
+        Trip trip = tripIn.toTrip(dbUser.get());
+        tripService.save(trip);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -95,10 +98,22 @@ public class TripsController {
 //    }
 
 
-    @RequestMapping(value = "", method = {RequestMethod.GET})
-    public ResponseEntity<?> getAllTrips() {
-        System.out.printf("get all trip");
-        return new ResponseEntity<>(tripService.all(), HttpStatus.OK);
+    @RequestMapping(value = "/userTrips", method = RequestMethod.POST)
+    public ResponseEntity<?> getUserTrips(@RequestBody Map<String, Long> requestBody) {
+        System.out.println("in back end");
+        Long userId = requestBody.get("userId");
+        List<Trip> userTrips = tripService.findAllTripsByUserId(userId);
+        if (userTrips.isEmpty()) {
+            return new ResponseEntity<>("No trips found for user: " + userId, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(userTrips, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/test", method = {RequestMethod.POST})
+    public ResponseEntity<String> test() {
+        System.out.println("in back end");
+
+        return new ResponseEntity<>("Server is running", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = {RequestMethod.GET})
@@ -106,16 +121,16 @@ public class TripsController {
         return new ResponseEntity<>(tripService.findById(id), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{customerId}/trips/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteTrip(@PathVariable Long customerId, @PathVariable Long id)
+    @RequestMapping(value = "/{userId}/trips/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteTrip(@PathVariable Long userId, @PathVariable Long id)
     {
-        Optional<Customer> dbCustomer = customerService.findById(customerId);
-        if (dbCustomer.isEmpty()) throw new RuntimeException("Customer with id: " + customerId + " not found");
+        Optional<DBUser> dbUser = userService.findUserById(userId);
+        if (dbUser.isEmpty()) throw new RuntimeException("User with id: " + userId + " not found");
 
-        Optional<Trip> dbCustomerTrip = tripService.findById(id);
-        if (dbCustomerTrip.isEmpty()) throw new RuntimeException("Customer trip with id: " + id + " not found");
+        Optional<Trip> dbUserTrip = tripService.findById(id);
+        if (dbUserTrip.isEmpty()) throw new RuntimeException("User trip with id: " + id + " not found");
 
-        tripService.delete(dbCustomerTrip.get());
+        tripService.delete(dbUserTrip.get());
         return new ResponseEntity<>("DELETED", HttpStatus.OK);
     }
 }

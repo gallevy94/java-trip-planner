@@ -3,6 +3,7 @@ package com.handson.trip_planner.model;
 import com.google.maps.model.LatLng;
 //import com.handson.trip_planner.utils.LatLngListConverter;
 //import com.handson.trip_planner.utils.CoordinatesConverter;
+import com.handson.trip_planner.jwt.DBUser;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Length;
 
@@ -39,9 +40,9 @@ public class TripIn {
     @Column(columnDefinition = "jsonb")
     private List<String> imagesUrls;
 
-    public Trip toTrip(Customer customer) {
+    public Trip toTrip(DBUser dbUser) {
         return aTrip()
-                .customer(customer)
+                .dbUser(dbUser)
                 .location(location)
                 .cityName(cityName)
                 .startDate(startDate)

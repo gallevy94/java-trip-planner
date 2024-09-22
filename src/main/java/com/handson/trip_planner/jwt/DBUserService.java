@@ -23,7 +23,8 @@ public class DBUserService {
     public Optional<DBUser> findUserById(Long id) {
         return repository.findById(id);
     }
-    public void save(DBUser user) {
+    public DBUser save(DBUser user) {
         repository.save(user);
+        return user;
     }
 }
