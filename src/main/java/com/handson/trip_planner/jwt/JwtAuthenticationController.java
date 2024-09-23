@@ -41,6 +41,7 @@ public class JwtAuthenticationController {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
+        System.out.println("*******Token: " + token);
 
         Long userId = userService.findUserName(authenticationRequest.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"))
@@ -56,10 +57,6 @@ public class JwtAuthenticationController {
                 .password(encodedPass).build();
         userService.save(user);
         UserDetails userDetails = new User(userRequest.getUsername(), encodedPass, new ArrayList<>());
-
-//        Long userId = userService.findUserName(userRequest.getUsername())
-//                .orElseThrow(() -> new UsernameNotFoundException("User not found"))
-//                .getId();
 
         return ResponseEntity.ok(new JwtResponse(jwtTokenUtil.generateToken(userDetails), user.getId()));
     }

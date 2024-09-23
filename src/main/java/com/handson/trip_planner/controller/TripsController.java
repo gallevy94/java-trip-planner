@@ -37,6 +37,7 @@ public class TripsController {
     @RequestMapping(value = "/trip-plan", method = RequestMethod.POST)
     public ResponseEntity<TripResponse> getTripPlan(@RequestParam String location, @RequestParam String startDate, @RequestParam String endDate, @RequestParam Long userId, HttpSession session) throws IOException {
 
+        System.out.println("in trip plan 40");
         // Check if the trip already exists in the database
         Optional<Trip> existingTrip = tripService.findExistingTrip(location, startDate, endDate);
         if (existingTrip.isPresent()) {
