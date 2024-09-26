@@ -36,7 +36,7 @@ public class GoogleController {
                 );
 
                 String newToken = tokenProvider.createToken(authentication);
-                return new ModelAndView("redirect:http://localhost:3000/dologin?token=" + newToken + "&username=" + userOpt.get().getName() + "&id=" + userOpt.get().getId());
+                return new ModelAndView("redirect:http://gal.trip.front.s3-website.eu-north-1.amazonaws.com/dologin?token=" + newToken + "&username=" + userOpt.get().getName() + "&id=" + userOpt.get().getId());
             }
         }
         throw new Exception("token invalid or user not found");
