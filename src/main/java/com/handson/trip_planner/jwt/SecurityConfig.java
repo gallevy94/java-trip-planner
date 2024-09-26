@@ -101,6 +101,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/","/oauth2/callback/google","/google","/googlelocal", "/api/email",
                         "/error","/api/dashboard/me", "/user", "/actuator/**",
+                        "/index.html",
+                        "/dologin",
                         "/favicon.ico",
                         "/**/*.png",
                         "/**/*.gif",
