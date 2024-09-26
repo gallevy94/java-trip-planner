@@ -42,6 +42,21 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            gallevy94/trip-planner:latest
-            gallevy94/trip-planner:${{ github.run_number }}
+          tags: gallevy94/trip-planner:latest
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            #!/bin/bash
+             container_id=$(docker ps | grep "0.0.0.0:8089" | awk '{print $1}')
+
+             if [ ! -z "$container_id" ]; then
+                 docker kill $container_id
+                 docker rm $container_id
+             fi
+             docker pull gallevy94/trip-planner
+             docker run -d -p 8089:8080 gallevy94/trip-planner
