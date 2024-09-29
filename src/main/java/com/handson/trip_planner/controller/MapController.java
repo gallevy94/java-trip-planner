@@ -22,10 +22,7 @@ public class MapController {
             @RequestParam double destinationLng,
             @RequestParam(required = false) String waypoints) {
 
-        System.out.println("directions");
         String result = mapService.getDirections(originLat, originLng, destinationLat, destinationLng, waypoints);
-        System.out.println("result");
-        System.out.println(result);
 
         return ResponseEntity.ok(result);
     }
